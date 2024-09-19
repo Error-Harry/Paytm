@@ -33,6 +33,19 @@ const UserSchema = new Schema({
   },
 });
 
-const User = new model("User", UserSchema);
+const AccountSchema = new Schema({
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  balance: {
+    type: Number,
+    required: true,
+  },
+});
 
-export { User };
+const User = new model("User", UserSchema);
+const Account = new model("Account", AccountSchema);
+
+export { User, Account };

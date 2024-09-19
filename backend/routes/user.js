@@ -2,7 +2,7 @@ import { Router } from "express";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { User } from "../db.js";
+import { Account, User } from "../db.js";
 import { signUpSchema, signInSchema, updateUserSchema } from "../validation.js";
 import { authMiddleware } from "./middleware.js";
 
@@ -32,6 +32,11 @@ router.post("/signup", async (req, res) => {
     }
     data.password = await bcrypt.hash(data.password, 10);
     const user = await User.create(data);
+    const userId = user._id;
+    await Account.create({
+      userId,
+      balance: 1 + Math.random() * 10000,
+    });
     const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
     return res
       .status(200)
@@ -86,6 +91,25 @@ router.put("/update", authMiddleware, async (req, res) => {
   });
   return res.json({
     msg: "Information updated successfully",
+  });
+});
+
+router.get("/bulk", authMiddleware, async (req, res) => {
+  const filter = req.query.filter;
+  const users = await User.find({
+    $or: [
+      { firstName: { $regex: `.*${filter}.*`, $options: "i" } },
+      { lastName: { $regex: `.*${filter}.*`, $options: "i" } },
+    ],
+  });
+
+  return res.json({
+    user: users.map((user) => ({
+      username: user.username,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      _id: user._id,
+    })),
   });
 });
 
