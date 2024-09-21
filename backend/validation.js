@@ -13,9 +13,14 @@ const signInSchema = z.object({
 });
 
 const updateUserSchema = z.object({
-	password: z.string().optional(),
-    firstName: z.string().optional(),
-    lastName: z.string().optional(),
-})
+  password: z.string().optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+});
 
-export { signUpSchema, signInSchema, updateUserSchema };
+const moneyTransferSchema = z.object({
+  to: z.string(),
+  amount: z.number(),
+});
+
+export { signUpSchema, signInSchema, updateUserSchema, moneyTransferSchema };
