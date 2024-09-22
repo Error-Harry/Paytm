@@ -50,12 +50,14 @@ To run the application, you will need to set up the following environment variab
    MONGODB_URL="Your mongoDB URL"
    SECRET_KEY="Your secret key"
    PORT=3000
+
 ## Run Project
-Navigate back to the root directory and run the development server::
-   ```bash
-   cd ..
-   npm install
-   npm run dev
+Navigate back to the root directory and run the development server:
+```bash
+cd ..
+npm install
+npm run dev
+```
 
 ## Usage
 - Access the frontend at `http://localhost:5173/`
