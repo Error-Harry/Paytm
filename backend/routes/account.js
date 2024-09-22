@@ -7,7 +7,6 @@ import mongoose from "mongoose";
 const router = Router();
 
 router.get("/balance", authMiddleware, async (req, res) => {
-  console.log(req);
   const account = await Account.findOne({
     userId: req.userId,
   });
@@ -58,7 +57,6 @@ router.post("/transfer", authMiddleware, async (req, res) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    console.error("Transfer failed:", error);
     return res.status(500).json({ msg: "Something went wrong" });
   }
 });

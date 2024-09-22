@@ -1,61 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
-const validateName = (name) => {
-  const nameRegex = /^[a-zA-ZàâäéèêëïîôöùûüÿçÀÂÄÉÈÊËÏÎÔÖÙÛÜŸÇ'-]+$/;
-
-  if (!name.trim()) {
-    return "This field is required";
-  }
-  if (name.length < 2 || name.length > 50) {
-    return "Name must be between 2 and 50 characters";
-  }
-  if (!nameRegex.test(name)) {
-    return "Name can only contain letters, hyphens, and apostrophes";
-  }
-  return null;
-};
-
-const validateUsername = (username) => {
-  const usernameRegex = /^[a-zA-Z0-9._-]{3,20}$/;
-  const consecutiveSpecialCharRegex = /([._-])\1/;
-
-  if (!username.trim()) return "Username is required";
-  if (username.length < 3) return "Username must be at least 3 characters";
-  if (username.length > 20) return "Username cannot exceed 20 characters";
-  if (!usernameRegex.test(username))
-    return "Username can only contain letters, numbers, underscores, periods, or hyphens";
-  if (/\s/.test(username)) return "Username cannot contain spaces";
-  if (consecutiveSpecialCharRegex.test(username))
-    return "Username cannot contain consecutive periods, underscores, or hyphens";
-  if (/^[._-]/.test(username))
-    return "Username cannot start with a period, underscore, or hyphen";
-  if (/[._-]$/.test(username))
-    return "Username cannot end with a period, underscore, or hyphen";
-
-  return null;
-};
-
-const validatePassword = (password) => {
-  if (!password) return "Password is required";
-  if (password.length < 6) return "Password must be at least 6 characters long";
-  if (password.length > 64) return "Password cannot exceed 64 characters";
-  if (!/[A-Z]/.test(password))
-    return "Password must contain at least one uppercase letter";
-  if (!/[a-z]/.test(password))
-    return "Password must contain at least one lowercase letter";
-  if (!/\d/.test(password)) return "Password must contain at least one number";
-  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password))
-    return "Password must contain at least one special character";
-  if (/\s/.test(password)) return "Password cannot contain spaces";
-
-  return null;
-};
-const validateConfrimPassword = (password, confirmPassword) => {
-  if (password !== confirmPassword) return "Passwords do not match";
-
-  return null;
-};
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useToast } from "../Contexts/ToastContext.jsx";
+import {
+  validateConfirmPassword,
+  validateName,
+  validatePassword,
+  validateUsername,
+} from "../Validation.js";
 
 function SignUp() {
   const [userData, setUserData] = useState({
@@ -73,32 +25,94 @@ function SignUp() {
     confirmPassword: "",
   });
 
+  const navigate = useNavigate();
+  const showToast = useToast();
+
+  const [mainError, setMainError] = useState();
+
   const handleFirstName = (e) => {
     setUserData({ ...userData, firstName: e.target.value });
     setErrors({ ...errors, firstName: validateName(e.target.value) });
+    setMainError("");
   };
 
   const handleLastName = (e) => {
     setUserData({ ...userData, lastName: e.target.value });
     setErrors({ ...errors, lastName: validateName(e.target.value) });
+    setMainError("");
   };
 
   const handleUsername = (e) => {
     setUserData({ ...userData, userName: e.target.value });
     setErrors({ ...errors, userName: validateUsername(e.target.value) });
+    setMainError("");
   };
 
   const handlePassword = (e) => {
     setUserData({ ...userData, password: e.target.value });
     setErrors({ ...errors, password: validatePassword(e.target.value) });
+    setMainError("");
   };
 
   const handleConfrimPassword = (e) => {
     setUserData({ ...userData, confirmPassword: e.target.value });
+    setMainError("");
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    const firstNameError = validateName(userData.firstName);
+    const lastNameError = validateName(userData.lastName);
+    const usernameError = validateUsername(userData.userName);
+    const passwordError = validatePassword(userData.password);
+    const confirmPasswordError = validateConfirmPassword(
+      userData.password,
+      userData.confirmPassword
+    );
+    const newErrors = {
+      firstName: firstNameError,
+      lastName: lastNameError,
+      userName: usernameError,
+      password: passwordError,
+      confirmPassword: confirmPasswordError,
+    };
+    setErrors(newErrors);
+    if (Object.values(newErrors).some((error) => error)) {
+      setMainError("Please correct the highlighted errors before submitting.");
+      return;
+    }
+    try {
+      const res = await axios.post("http://localhost:3000/api/v1/user/signup", {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        username: userData.userName,
+        password: userData.confirmPassword,
+      });
+
+      if (res.data.token) {
+        showToast(res.data.msg, "success");
+        setUserData({
+          firstName: "",
+          lastName: "",
+          userName: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setErrors({
+          firstName: "",
+          lastName: "",
+          userName: "",
+          password: "",
+          confirmPassword: "",
+        });
+        setMainError("");
+        navigate("/signin");
+      } else {
+        setMainError(res.data.msg);
+      }
+    } catch (error) {
+      setMainError("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -192,6 +206,9 @@ function SignUp() {
           >
             Sign Up
           </button>
+          {mainError && (
+            <p className="text-red-500 text-sm mt-1">{mainError}</p>
+          )}
         </form>
 
         <p className="text-center mt-4 text-gray-400 text-sm">

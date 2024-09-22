@@ -1,22 +1,8 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-
-const validateUsername = (username) => {
-  const usernameRegex = /^[a-zA-Z0-9._-]{3,20}$/;
-
-  if (!username.trim()) return "Username is required";
-  if (!usernameRegex.test(username))
-    return "Username can only contain letters, numbers, underscores, periods, or hyphens";
-  if (/\s/.test(username)) return "Username cannot contain spaces";
-
-  return null;
-};
-
-const validatePassword = (password) => {
-  if (!password) return "Password is required";
-
-  return null;
-};
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useToast } from "../Contexts/ToastContext.jsx";
+import { validateSignInPassword, validateUsername } from "../Validation.js";
 
 function SignIn() {
   const [userData, setUserData] = useState({
@@ -28,20 +14,66 @@ function SignIn() {
     password: null,
   });
 
+  const navigate = useNavigate();
+  const showToast = useToast();
+
+  const [mainError, setMainError] = useState();
+
   const handleUsername = (e) => {
     const userName = e.target.value;
     setUserData({ ...userData, userName });
     setErrors({ ...errors, userName: validateUsername(userName) });
+    setMainError("");
   };
 
   const handlePassword = (e) => {
     const password = e.target.value;
     setUserData({ ...userData, password });
-    setErrors({ ...errors, password: validatePassword(password) });
+    setErrors({ ...errors, password: validateSignInPassword(password) });
+    setMainError("");
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
+    const usernameError = validateUsername(userData.userName);
+    const passwordError = validateSignInPassword(userData.password);
+    const newErrors = {
+      userName: usernameError,
+      password: passwordError,
+    };
+    setErrors(newErrors);
+    if (Object.values(newErrors).some((error) => error)) {
+      setMainError("Please correct the highlighted errors before submitting.");
+      return;
+    }
+
+    try {
+      const res = await axios.post("http://localhost:3000/api/v1/user/signin", {
+        username: userData.userName,
+        password: userData.password,
+      });
+
+      if (res.data.token) {
+        showToast(res.data.msg, "success");
+        localStorage.setItem("token", res.data.token);
+        setUserData({
+          userName: "",
+          password: "",
+        });
+        setErrors({
+          userName: "",
+          password: "",
+        });
+        setMainError("");
+        navigate("/");
+      }
+    } catch (error) {
+      if (error.response && error.response.data) {
+        setMainError(error.response.data.msg);
+      } else {
+        setMainError("Something went wrong. Please try again.");
+      }
+    }
   };
 
   return (
@@ -50,7 +82,7 @@ function SignIn() {
         <h2 className="text-xl font-bold text-center mb-4 text-white">
           Sign In
         </h2>
-        <form onSubmit={onSubmit}>
+        <form method="POST" onSubmit={onSubmit}>
           <div className="mb-3">
             <input
               type="text"
@@ -85,6 +117,9 @@ function SignIn() {
           >
             Sign In
           </button>
+          {mainError && (
+            <p className="text-red-500 text-sm mt-1">{mainError}</p>
+          )}
         </form>
         <p className="text-center mt-4 text-gray-400 text-sm">
           Don't have an account?{" "}
