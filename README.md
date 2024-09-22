@@ -61,4 +61,4 @@ npm run dev
 
 ## Usage
 - Access the frontend at `http://localhost:5173/`
-- `http://localhost:3000/`
+- Access the backend at `http://localhost:3000/`
