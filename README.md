@@ -8,6 +8,7 @@ This project is a full-stack application for a payment gateway. It is built usin
 - **Backend:** Node.js with Express
 - **Database:** MongoDB
 - **Styling:** Tailwind CSS
+- **Validation:** Zod
 
 ## Features
 - User authentication (Sign In, Sign Up)
