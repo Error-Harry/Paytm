@@ -23,7 +23,7 @@ function Send() {
       );
 
       const res = await axios.post(
-        "http://localhost:3000/api/v1/account/transfer",
+        `${import.meta.env.VITE_API_URL}/api/v1/account/transfer`,
         { to: userId, amount: parsedAmount },
         {
           headers: {
@@ -45,7 +45,7 @@ function Send() {
     const fetchUserInfo = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/v1/user/userInfo`,
+          `${import.meta.env.VITE_API_URL}/api/v1/user/userInfo`,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("token"),

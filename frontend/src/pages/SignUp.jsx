@@ -82,12 +82,15 @@ function SignUp() {
       return;
     }
     try {
-      const res = await axios.post("http://localhost:3000/api/v1/user/signup", {
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        username: userData.userName,
-        password: userData.confirmPassword,
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/v1/user/signup`,
+        {
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          username: userData.userName,
+          password: userData.confirmPassword,
+        }
+      );
 
       if (res.data.token) {
         showToast(res.data.msg, "success");

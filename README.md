@@ -38,7 +38,7 @@ This project is a full-stack application for a payment gateway. It is built usin
 
 To run the application, you will need to set up the following environment variables in a `.env` file in the `backend` directory:
 
-### Steps to create the `.env` file:
+### Steps to create the `.env` file for backend:
 
 1. Navigate to the `backend` directory:
    ```bash
@@ -51,6 +51,17 @@ To run the application, you will need to set up the following environment variab
    MONGODB_URL="Your mongoDB URL"
    SECRET_KEY="Your secret key"
    PORT=3000
+
+### Steps to create the `.env` file for frontend:
+1. Navigate to the `frontend` directory:
+   ```bash
+   cd ../frontend
+
+2. Crate `.env` file
+3. Open the `.env` file in a text editor and add the following content:
+
+   ```plaintext
+   VITE_API_URL=http://localhost:3000
 
 ## Run Project
 Navigate back to the root directory and run the development server:

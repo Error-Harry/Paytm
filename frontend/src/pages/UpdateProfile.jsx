@@ -47,7 +47,7 @@ const UpdateProfile = () => {
     const fetchUserData = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/v1/user/userInfo`,
+          `${import.meta.env.VITE_API_URL}/api/v1/user/userInfo`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -94,7 +94,7 @@ const UpdateProfile = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/v1/user/update`,
+        `${import.meta.env.VITE_API_URL}/api/v1/user/update`,
         userData,
         {
           headers: {
@@ -142,7 +142,7 @@ const UpdateProfile = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/v1/user/updatePassword`,
+        `${import.meta.env.VITE_API_URL}/api/v1/user/updatePassword`,
         passwordData,
         {
           headers: {

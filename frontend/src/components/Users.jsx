@@ -35,7 +35,7 @@ function Users() {
     const fetchUsers = async (filter = "") => {
       setLoading(true);
       try {
-        const res = await axios.get("http://localhost:3000/api/v1/user/bulk", {
+        const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/v1/user/bulk`, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
