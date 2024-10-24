@@ -71,6 +71,14 @@ npm install
 npm run dev
 ```
 
+## Run Using Docker
+
+To run the application using Docker, make sure your environment variables are set in the `docker-compose.yml`, and run the following command from the root directory:
+
+```bash
+docker-compose up
+```
+
 ## Usage
 - Access the frontend at `http://localhost:5173/`
 - Access the backend at `http://localhost:3000/`
